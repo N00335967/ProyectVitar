@@ -1,5 +1,4 @@
 package com.proyecto.vitar.presentation.screens.Inicio
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

@@ -7,6 +7,7 @@ object NavRutas {
 
     const val INICIARSESION= "IniciarSesion"
     const val REGISTRARSE= "Registrarse"
+    const val RECUPERAR_PASSWORD= "recuperar_password"
 
 
 }

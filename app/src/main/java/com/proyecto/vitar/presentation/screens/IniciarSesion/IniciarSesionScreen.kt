@@ -218,7 +218,11 @@ fun IniciarSesionScreen(navController: NavController, vm: UsuarioViewModel) {
                         Text(
                             text = "¿Olvidaste tu contraseña?",
                             color = Color(0xFF1147D9),
-                            fontSize = 14.sp
+                            fontSize = 14.sp,
+                            //SE AGREGO RECUPERAR CONTRASEÑA COMO CLICKEABLE
+                            modifier = Modifier.clickable{
+                                navController.navigate(NavRutas.RECUPERAR_PASSWORD)
+                            }
                         )
                     }
 

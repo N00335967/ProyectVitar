@@ -22,6 +22,7 @@ import com.proyecto.vitar.presentation.screens.Historial.HistorialScreen
 import com.proyecto.vitar.presentation.screens.IniciarSesion.IniciarSesionScreen
 import com.proyecto.vitar.presentation.screens.Inicio.InicioScreen
 import com.proyecto.vitar.presentation.screens.Perfil.PerfilScreen
+import com.proyecto.vitar.presentation.screens.RecuperarPassword.RecuperarPasswordScreen
 import com.proyecto.vitar.presentation.screens.Registrarse.RegistrarseScreen
 import com.proyecto.vitar.presentation.viewmodel.UsuarioViewModel
 
@@ -40,7 +41,7 @@ fun AppNavigation(usuarioViewModel: UsuarioViewModel){
         navController.currentBackStackEntryAsState().value?.destination?.route
 
     val mostrarBarras = rutaActual != NavRutas.INICIARSESION &&
-            rutaActual != NavRutas.REGISTRARSE
+            rutaActual != NavRutas.REGISTRARSE && rutaActual != NavRutas.RECUPERAR_PASSWORD
 
     val tituloActual = listaOpcion.find { it.ruta == rutaActual }?.titulo ?: "Inicio"
 
@@ -109,6 +110,7 @@ fun AppNavigation(usuarioViewModel: UsuarioViewModel){
             composable (NavRutas.INICIO){ InicioScreen() }
             composable (NavRutas.HISTORIAL){ HistorialScreen() }
             composable (NavRutas.PERFIL){ PerfilScreen(navController, usuarioViewModel) }
+            composable (NavRutas.RECUPERAR_PASSWORD){ RecuperarPasswordScreen(navController)}
 
         }
     }
