@@ -10,9 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class UsuarioViewModel(
-    private val sessionManager: SessionManager
-) : ViewModel() {
+class UsuarioViewModel(private val sessionManager: SessionManager) : ViewModel() {
 
     private val _uiState =
         MutableStateFlow(UsuarioUiState())
@@ -100,11 +98,11 @@ class UsuarioViewModel(
                 return@launch
             }
 
-            val loginCorrecto =
-                sessionManager.validarLogin(
+            val loginCorrecto =true //prueba
+                /*sessionManager.validarLogin(
                     correo,
                     password
-                )
+                )*/
 
             if (loginCorrecto) {
 

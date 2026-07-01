@@ -9,5 +9,5 @@ import androidx.compose.ui.graphics.vector.ImageVector
 sealed class BottomNavItem (val ruta: String, val titulo: String, val icono: ImageVector){
     data object Inicio: BottomNavItem(NavRutas.INICIO, "Inicio", Icons.Default.Home)
     data object Historial: BottomNavItem(NavRutas.HISTORIAL,"Historial", Icons.Default.Update)
-    data object Perilf: BottomNavItem(NavRutas.PERFIL,"Perilf", Icons.Default.Person)
+    data object Perilf: BottomNavItem(NavRutas.PERFIL,"Perfil", Icons.Default.Person)
 }

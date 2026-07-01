@@ -7,7 +7,8 @@ fun UsuarioDto.toDomain(): Usuario {
     return Usuario(
         id = this.id,
         nombre = this.nombre,
-        correo = this.correo
+        correo = this.correo,
+        //password= this.password
         // password no debería ir aquí, por seguridad no se debe pasar a la capa de dominio
     )
 }
