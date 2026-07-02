@@ -1,15 +1,20 @@
 package com.proyecto.vitar.di
 
-import com.proyecto.vitar.core.storage.SessionManager
-import com.proyecto.vitar.presentation.viewmodel.UsuarioViewModel
+import com.proyecto.vitar.presentation.screens.IniciarSesion.IniciarSesionViewModel
+import com.proyecto.vitar.presentation.screens.Perfil.PerfilViewModel
+import com.proyecto.vitar.presentation.screens.Registrarse.RegistrarseViewModel
 
-class ViewModelModule(private val useCaseModule: UseCaseModule, private val sessionManager: SessionManager) {
+class ViewModelModule(private val useCaseModule: UseCaseModule) {
 
-    // Proveedor para el ViewModel de Autenticación / Login
-    fun provideUsuarioViewModel(): UsuarioViewModel {
-        return UsuarioViewModel(sessionManager)
+    fun provideIniciarSesionViewModel(): IniciarSesionViewModel {
+        return IniciarSesionViewModel(useCaseModule.usuarioUseCases)
     }
 
-    // Más adelante, cuando agregues más pantallas, simplemente sumas sus funciones:
-    // fun provideHomeViewModel(): HomeViewModel { ... }
+    fun provideRegistrarseViewModel(): RegistrarseViewModel {
+        return RegistrarseViewModel(useCaseModule.usuarioUseCases)
+    }
+
+    fun providePerfilViewModel(): PerfilViewModel {
+        return PerfilViewModel(useCaseModule.usuarioUseCases)
+    }
 }

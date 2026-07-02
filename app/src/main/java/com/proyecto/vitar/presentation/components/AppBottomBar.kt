@@ -1,11 +1,23 @@
 package com.proyecto.vitar.presentation.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -17,24 +29,25 @@ fun AppBottomBar(navController: NavHostController) {
     val menuItems = listOf(
         BottomNavItem.Inicio,
         BottomNavItem.Historial,
-        BottomNavItem.Perilf // Mantengo el nombre exacto de tu archivo
+        BottomNavItem.Perfil
     )
 
-    // Esto detecta en qué pantalla está el usuario para iluminar el botón correcto
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    NavigationBar {
+    NavigationBar(
+        containerColor = Color.White,
+        tonalElevation = 8.dp // Un poco de elevación para que se note la separación
+    ) {
         menuItems.forEach { item ->
+            val selected = currentRoute == item.ruta
+            
             NavigationBarItem(
-                label = { Text(text = item.titulo) },
-                icon = { Icon(imageVector = item.icono, contentDescription = item.titulo) },
-                selected = currentRoute == item.ruta,
+                selected = selected,
+                alwaysShowLabel = true, // Siempre mostramos el texto abajo
                 onClick = {
-                    // Solo navega si el usuario no está ya en esa pantalla
                     if (currentRoute != item.ruta) {
                         navController.navigate(item.ruta) {
-                            // Evita que se acumulen pantallas en el historial si presionas muchas veces
                             popUpTo(navController.graph.findStartDestination().id) {
                                 saveState = true
                             }
@@ -42,7 +55,44 @@ fun AppBottomBar(navController: NavHostController) {
                             restoreState = true
                         }
                     }
-                }
+                },
+                icon = {
+                    if (selected) {
+                        // Ajustamos el tamaño del "pill" verde para que no se corte
+                        Box(
+                            modifier = Modifier
+                                .size(width = 64.dp, height = 32.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(Color(0xFF64FFB5)), // Verde neón
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = item.icono,
+                                contentDescription = item.titulo,
+                                tint = Color(0xFF11224D)
+                            )
+                        }
+                    } else {
+                        Icon(
+                            imageVector = item.icono, 
+                            contentDescription = item.titulo,
+                            tint = Color.Gray
+                        )
+                    }
+                },
+                label = { 
+                    Text(
+                        text = item.titulo, 
+                        fontSize = 12.sp,
+                        color = if (selected) Color(0xFF11224D) else Color.Gray,
+                        fontWeight = if (selected) androidx.compose.ui.text.font.FontWeight.Bold else androidx.compose.ui.text.font.FontWeight.Normal
+                    )
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    indicatorColor = Color.Transparent, // Usamos nuestro Box personalizado
+                    selectedIconColor = Color(0xFF11224D),
+                    unselectedIconColor = Color.Gray
+                )
             )
         }
     }

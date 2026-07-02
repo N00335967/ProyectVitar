@@ -1,10 +1,13 @@
 package com.proyecto.vitar.presentation.screens.Inicio
+
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CurrencyBitcoin
 import androidx.compose.material.icons.filled.StackedLineChart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -30,300 +34,241 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.proyecto.vitar.core.navigation.NavRutas
 
 @Composable
-fun InicioScreen() {
+fun InicioScreen(navController: NavController) {
 
     Column(
         modifier = Modifier
-            .fillMaxWidth()// Hace que el Column ocupe_todo el ancho disponible.
-            .padding(16.dp)// Agrega espacio alrededor del contenido para que no quede pegado a los bordes.
-            .verticalScroll(rememberScrollState()) // Permite desplazar la pantalla hacia
-        // arriba y abajo cuando el contenido no cabe. Pero no lo baja
-        //por comleto y se come algunas cosas
+            .fillMaxSize()
+            .background(Color(0xFFF7F7FB))
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp)
     ) {
 
-        // Tarjeta Balance
-        Card(// Card crea una tarjeta visual siguiendo Material Design.
+        // Tarjeta Balance Total
+        Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),// Redondea las esquinas de la tarjeta.
-            colors = CardDefaults.cardColors(// Permite personalizar los colores de la Card.
-                containerColor = Color(0xFF0B57FF)// Color de fondo de la tarjeta.
-            )
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF0B57FF)),
+            elevation = CardDefaults.cardElevation(4.dp)
         ) {
-            Column(
-                modifier = Modifier.padding(24.dp)
-            ) {
-                Spacer(modifier = Modifier.height(20.dp))
-
+            Column(modifier = Modifier.padding(24.dp)) {
                 Text(
                     text = "BALANCE TOTAL",
                     color = Color.White.copy(alpha = 0.8f),
-                    // Color.White = color blanco.
-                    // copy() crea una copia del color original modificando alguna propiedad.
-                    // alpha controla la transparencia.
-                    // 1f = completamente visible.
-                    // 0f = completamente transparente.
-                    // 0.8f = 80% visible y 20% transparente.
-                    fontSize = 16.sp
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "30.000,00 €",
-                    color = Color.White,
-                    fontSize = 36.sp,
-                    fontWeight = FontWeight.Bold
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
+                Row(verticalAlignment = Alignment.Bottom) {
+                    Text(
+                        text = "30.000,00",
+                        color = Color.White,
+                        fontSize = 42.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = " €",
+                        color = Color.White,
+                        fontSize = 24.sp,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Surface(
                     shape = RoundedCornerShape(50),
-                    color = Color(0xFF1F6CFF)
+                    color = Color.White.copy(alpha = 0.15f)
                 ) {
                     Row(
-                        modifier = Modifier.padding(
-                            horizontal = 12.dp,
-                            vertical = 6.dp
-                        ),
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector = Icons.Default.StackedLineChart,// Define qué icono se mostrará.
+                            imageVector = Icons.Default.StackedLineChart,
                             contentDescription = null,
-                            // Texto para accesibilidad.
-                            // Se usa para que lectores de pantalla describan el icono.
-                            // Como el icono es solo decorativo, usamos null.
-                            tint = Color(0xFF7DFFB3),// Cambia el color del icono.
-                            modifier = Modifier.size(18.dp)
+                            tint = Color(0xFF7DFFB3),
+                            modifier = Modifier.size(16.dp)
                         )
-
-                        Spacer(modifier = Modifier.width(4.dp))
-
+                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "+2.4% hoy",
-                            color = Color(0xFF7DFFB3)
+                            color = Color(0xFF7DFFB3),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-        // Tarjeta Bitcoin
+        // Tarjeta Bitcoin Principal
         Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { navController.navigate(NavRutas.DETALLEBITCOIN) },
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(2.dp)
         ) {
-
-            Column(
-                modifier = Modifier.padding(10.dp)
-            ) {
-
+            Column(modifier = Modifier.padding(16.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-
-                    Column {
-                        Text(
-                            text = "Bitcoin",
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-
-                        Text(
-                            text = "BTC",
-                            color = Color.Gray
-                        )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFFFFF4ED)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.CurrencyBitcoin,
+                                contentDescription = null,
+                                tint = Color(0xFFF7931A),
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column {
+                            Text(text = "Bitcoin", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF11224D))
+                            Text(text = "BTC", color = Color.Gray, fontSize = 14.sp)
+                        }
                     }
 
-                    Column(
-                        horizontalAlignment = Alignment.End
-                    ) {
-
-                        Text(
-                            text = "60.000,00 €",
-                            fontWeight = FontWeight.Bold
-                        )
-
-                        Text(
-                            text = "+1.25%",
-                            color = Color(0xFF008A4B)
-                        )
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text(text = "60.000,00 €", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF11224D))
+                        Text(text = "+1.25%", color = Color(0xFF008A4B), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
+                // Gráfico de barras simplificado
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        .height(80.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.Bottom
                 ) {
-
-                    val alturas = listOf(40, 30, 55, 45, 70, 60, 85, 100)
-
+                    val alturas = listOf(30, 25, 35, 40, 32, 50, 65, 75)
                     alturas.forEachIndexed { index, altura ->
-
                         Box(
                             modifier = Modifier
                                 .weight(1f)
                                 .height(altura.dp)
                                 .clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
                                 .background(
-                                    if (index >= 6)
-                                        Color(0xFF007A3D)
-                                    else
-                                        Color(0xFFC7DDD5)
+                                    if (index >= 6) Color(0xFF00704A) else Color(0xFFB8D5C8)
                                 )
                         )
                     }
                 }
 
-                HorizontalDivider(
-                    modifier = Modifier.padding(top = 8.dp)
-                )
+                HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp), color = Color(0xFFF1F1F1))
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Text(text = "CANTIDAD QUE POSEES", color = Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                
+                Spacer(modifier = Modifier.height(10.dp))
 
-                Text(
-                    text = "CANTIDAD QUE POSEES",
-                    color = Color.Gray
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFF5F5F5)
-                    )
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    color = Color(0xFFF1F4F9)
                 ) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(18.dp),
+                        modifier = Modifier.padding(16.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("0.5")
-                        Text("BTC")
+                        Text(text = "0.5", color = Color.LightGray, fontSize = 16.sp)
+                        Text(text = "BTC", color = Color.Gray, fontSize = 16.sp)
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFF3F0FF)
-                    )
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    color = Color(0xFFF3F0FF)
                 ) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(18.dp),
+                        modifier = Modifier.padding(16.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
-                        // SpaceBetween distribuye los elementos horizontalmente.
-                        // El primer elemento se coloca al inicio.
-                        // El último elemento se coloca al final.
-                        // Todo_el espacio restante se reparte entre ellos.
                     ) {
-
-                        Text("Valor de tu inversión:")
-
-                        Text(
-                            text = "30.000,00 €",
-                            color = Color(0xFF2457FF)
-                        )
+                        Text(text = "Valor de tu inversión:", color = Color.Gray, fontSize = 15.sp)
+                        Text(text = "30.000,00 €", color = Color(0xFF2457FF), fontWeight = FontWeight.Bold, fontSize = 15.sp)
                     }
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
+        // Botones de Comprar y Vender (Estilo Cards)
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-
             Card(
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(4.dp)
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable { navController.navigate(NavRutas.COMPRARBITCOIN) },
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(2.dp)
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 12.dp),
+                    modifier = Modifier.padding(20.dp).fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-
                     Box(
-                        modifier = Modifier
-                            .size(38.dp)
-                            .background(
-                                Color(0xFF63F0A4),
-                                CircleShape
-                            ),
+                        modifier = Modifier.size(44.dp).background(Color(0xFF64FFB5).copy(alpha = 0.4f), CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "+",
-                            fontSize = 32.sp,
-                            color = Color(0xFF007A3D)
-                        )
+                        Text(text = "+", fontSize = 28.sp, color = Color(0xFF007A3D), fontWeight = FontWeight.Bold)
                     }
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    Text(
-                        text = "Comprar",
-                        fontSize = 22.sp
-                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(text = "Comprar", fontSize = 16.sp, color = Color(0xFF11224D), fontWeight = FontWeight.Medium)
                 }
             }
 
             Card(
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(4.dp)
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable { navController.navigate(NavRutas.VENDERBITCOIN) },
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(2.dp)
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 12.dp),
+                    modifier = Modifier.padding(20.dp).fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-
                     Box(
-                        modifier = Modifier
-                            .size(38.dp)
-                            .background(
-                                Color(0xFFFFE4DE),
-                                CircleShape
-                            ),
+                        modifier = Modifier.size(44.dp).background(Color(0xFFFFE4DE), CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "−",
-                            fontSize = 32.sp,
-                            color = Color(0xFF7A2A1A)
-                        )
+                        Text(text = "−", fontSize = 28.sp, color = Color(0xFF7A2A1A), fontWeight = FontWeight.Bold)
                     }
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    Text(
-                        text = "Vender",
-                        fontSize = 22.sp
-                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(text = "Vender", fontSize = 16.sp, color = Color(0xFF11224D), fontWeight = FontWeight.Medium)
                 }
             }
         }
 
-        //Spacer(modifier = Modifier.height(100.dp))
+        Spacer(modifier = Modifier.height(100.dp))
     }
 }

@@ -1,9 +1,9 @@
 package com.proyecto.vitar.di
 
 import android.content.Context
-import com.proyecto.vitar.core.storage.SessionManager
-import com.proyecto.vitar.presentation.viewmodel.UsuarioViewModel
-import kotlin.getValue
+import com.proyecto.vitar.presentation.screens.IniciarSesion.IniciarSesionViewModel
+import com.proyecto.vitar.presentation.screens.Perfil.PerfilViewModel
+import com.proyecto.vitar.presentation.screens.Registrarse.RegistrarseViewModel
 
 class AppContainer(private val context: Context) {
 
@@ -18,11 +18,16 @@ class AppContainer(private val context: Context) {
     private val useCaseModule by lazy {
         UseCaseModule(repositoryModule)
     }
-    val viewModelModule by lazy {
-        ViewModelModule(useCaseModule, sessionManager)
+
+    val iniciarSesionViewModel by lazy {
+        IniciarSesionViewModel(useCaseModule.usuarioUseCases)
     }
-    private val sessionManager by lazy { SessionManager(context) }
-    val usuarioViewModel by lazy {
-        UsuarioViewModel(sessionManager)
+
+    val registrarseViewModel by lazy {
+        RegistrarseViewModel(useCaseModule.usuarioUseCases)
+    }
+
+    val perfilViewModel by lazy {
+        PerfilViewModel(useCaseModule.usuarioUseCases)
     }
 }

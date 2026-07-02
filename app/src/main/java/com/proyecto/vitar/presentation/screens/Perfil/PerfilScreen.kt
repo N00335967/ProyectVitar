@@ -27,12 +27,21 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SupportAgent
 import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,10 +54,40 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.proyecto.vitar.R
 import com.proyecto.vitar.core.navigation.NavRutas
-import com.proyecto.vitar.presentation.viewmodel.UsuarioViewModel
 
 @Composable
-fun PerfilScreen(navController: NavController, vm: UsuarioViewModel) {
+fun PerfilScreen(navController: NavController, vm: PerfilViewModel) {
+
+    val uiState by vm.uiState.collectAsState()
+    var showEditDialog by remember { mutableStateOf(false) }
+    var nuevoNombre by remember { mutableStateOf("") }
+
+    if (showEditDialog) {
+        AlertDialog(
+            onDismissRequest = { showEditDialog = false },
+            title = { Text("Editar nombre") },
+            text = {
+                OutlinedTextField(
+                    value = nuevoNombre,
+                    onValueChange = { nuevoNombre = it },
+                    label = { Text("Nuevo nombre") }
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    vm.updateNombre(nuevoNombre)
+                    showEditDialog = false
+                }) {
+                    Text("Guardar")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showEditDialog = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -70,7 +109,7 @@ fun PerfilScreen(navController: NavController, vm: UsuarioViewModel) {
                 contentDescription = "homero",
                 modifier = Modifier
                     .size(120.dp)
-                    .border(//Le agrega un borde alrededor de la imagen
+                    .border(
                         width = 2.dp,
                         color = Color(0xFF0000FF),
                         shape = CircleShape
@@ -90,13 +129,13 @@ fun PerfilScreen(navController: NavController, vm: UsuarioViewModel) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = vm.obtenerNombre(),
+            text = uiState.nombre.ifEmpty { "Usuario" },
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold
         )
 
         Text(
-            text = vm.obtenerCorreo(),
+            text = uiState.correo,
             color = Color.Gray,
             fontSize = 16.sp
         )
@@ -111,16 +150,13 @@ fun PerfilScreen(navController: NavController, vm: UsuarioViewModel) {
                 containerColor = Color.White
             )
         ) {
-
             Column(
                 modifier = Modifier.padding(24.dp)
             ) {
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-
                     Text(
                         text = "VALOR TOTAL ESTIMADO",
                         color = Color.Gray,
@@ -170,7 +206,7 @@ fun PerfilScreen(navController: NavController, vm: UsuarioViewModel) {
                     color = Color.Gray
                 )
 
-                Divider(
+                HorizontalDivider(
                     modifier = Modifier.padding(vertical = 20.dp)
                 )
 
@@ -179,11 +215,9 @@ fun PerfilScreen(navController: NavController, vm: UsuarioViewModel) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-
                         Box(
                             modifier = Modifier
                                 .size(10.dp)
@@ -220,39 +254,39 @@ fun PerfilScreen(navController: NavController, vm: UsuarioViewModel) {
                 containerColor = Color.White
             )
         ) {
-
             OpcionPerfil(
                 Icons.Default.Edit,
-                "Editar nombre"
+                "Editar nombre",
+                onClick = {
+                    nuevoNombre = uiState.nombre
+                    showEditDialog = true
+                }
             )
 
-            Divider()
+            HorizontalDivider()
 
             OpcionPerfil(
                 Icons.Default.Settings,
                 "Configuración"
             )
 
-            Divider()
+            HorizontalDivider()
 
             OpcionPerfil(
                 Icons.Default.Notifications,
                 "Notificaciones"
             )
 
-            Divider()
+            HorizontalDivider()
 
             OpcionPerfil(
                 icono = Icons.AutoMirrored.Filled.Logout,
                 texto = "Cerrar sesión",
                 colorTexto = Color.Red,
-                {
-                    vm.cerrarSesion()
-                    navController.navigate(
-                        NavRutas.INICIARSESION
-                    ) {
-
-                        popUpTo(0)
+                onClick = {
+                    vm.logout()
+                    navController.navigate(NavRutas.INICIARSESION) {
+                        popUpTo(0) { inclusive = true }
                     }
                 }
             )
@@ -268,12 +302,10 @@ fun PerfilScreen(navController: NavController, vm: UsuarioViewModel) {
                 containerColor = Color(0xFFF1F1FF)
             )
         ) {
-
             Row(
                 modifier = Modifier.padding(20.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
                 Box(
                     modifier = Modifier
                         .size(60.dp)
@@ -293,7 +325,6 @@ fun PerfilScreen(navController: NavController, vm: UsuarioViewModel) {
                 Spacer(modifier = Modifier.width(16.dp))
 
                 Column {
-
                     Text(
                         text = "¿Necesitas ayuda?",
                         fontWeight = FontWeight.Bold,
@@ -307,21 +338,16 @@ fun PerfilScreen(navController: NavController, vm: UsuarioViewModel) {
                 }
             }
         }
-        //Spacer(modifier = Modifier.height(100.dp))
     }
 }
 
 @Composable
-//Lo mismo como el HistorialItem
-//Es para reperir las mismas cosas con el mismo formato
-//donde solo damos los datos correspondientes
 fun OpcionPerfil(
     icono: ImageVector,
     texto: String,
     colorTexto: Color = Color.Black,
     onClick: () -> Unit = {}
 ) {
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -331,7 +357,6 @@ fun OpcionPerfil(
             .padding(20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-
         Icon(
             imageVector = icono,
             contentDescription = null,
