@@ -15,6 +15,6 @@ class ViewModelModule(private val useCaseModule: UseCaseModule) {
     }
 
     fun providePerfilViewModel(): PerfilViewModel {
-        return PerfilViewModel(useCaseModule.usuarioUseCases)
+        return PerfilViewModel(useCaseModule.usuarioUseCases, useCaseModule.bitcoinUseCases)
     }
 }

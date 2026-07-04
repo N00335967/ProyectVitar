@@ -1,45 +1,39 @@
 package com.proyecto.vitar.presentation.screens.ComprarBitcoin
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.proyecto.vitar.presentation.screens.Perfil.PerfilViewModel
+import java.util.Locale
 
 @Composable
 fun ComprarBitcoinPantalla(navController: NavController, vm: PerfilViewModel) {
+
+    val uiState by vm.uiState.collectAsState()
+    val btcPrice = uiState.btcPrice
+    val currency = uiState.selectedCurrency
+
+    var cantidad by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -88,12 +82,12 @@ fun ComprarBitcoinPantalla(navController: NavController, vm: PerfilViewModel) {
                 Spacer(modifier = Modifier.height(15.dp))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "$64,281.45", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 38.sp)
+                    Text(text = String.format(Locale.US, "%.2f %s", btcPrice, currency.symbol), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 38.sp)
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(text = "+2.4%", color = Color(0xFF5CFF8E), fontSize = 18.sp, fontWeight = FontWeight.Medium)
                 }
 
-                Text(text = "1 BTC = 59.412,20 €", color = Color.White.copy(alpha = 0.6f), fontSize = 16.sp)
+                Text(text = String.format(Locale.US, "1 BTC = %.2f %s", btcPrice, currency.symbol), color = Color.White.copy(alpha = 0.6f), fontSize = 16.sp)
             }
         }
 
@@ -114,15 +108,32 @@ fun ComprarBitcoinPantalla(navController: NavController, vm: PerfilViewModel) {
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.Bottom) {
-                        Text(text = "0.0150", fontSize = 32.sp, fontWeight = FontWeight.Bold, color = Color(0xFF11224D))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(text = "BTC", color = Color(0xFF0D47D9), fontSize = 16.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 4.dp))
-                    }
+                    BasicTextField(
+                        value = cantidad,
+                        onValueChange = { if (it.all { char -> char.isDigit() || char == '.' }) cantidad = it },
+                        modifier = Modifier.weight(1f),
+                        textStyle = TextStyle(
+                            fontSize = 32.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF11224D)
+                        ),
+                        decorationBox = { innerTextField ->
+                            Row(verticalAlignment = Alignment.Bottom) {
+                                Box(modifier = Modifier.weight(1f)) {
+                                    if (cantidad.isEmpty()) Text("0.00", fontSize = 32.sp, color = Color.LightGray)
+                                    innerTextField()
+                                }
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(text = "BTC", color = Color(0xFF0D47D9), fontSize = 16.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 4.dp))
+                            }
+                        }
+                    )
                     Box(modifier = Modifier.width(1.dp).height(40.dp).background(Color(0xFFEEEEEE)))
                     Column(modifier = Modifier.weight(1f).padding(start = 15.dp), horizontalAlignment = Alignment.End) {
-                        Text(text = "≈ $964.22", fontWeight = FontWeight.Bold, fontSize = 26.sp, color = Color(0xFF11224D))
-                        Text(text = "891,18 €", color = Color.Gray, fontSize = 14.sp)
+                        val cantNum = cantidad.toDoubleOrNull() ?: 0.0
+                        val subtotal = cantNum * btcPrice
+                        Text(text = String.format(Locale.US, "≈ %.2f", subtotal), fontWeight = FontWeight.Bold, fontSize = 26.sp, color = Color(0xFF11224D))
+                        Text(text = currency.symbol, color = Color.Gray, fontSize = 14.sp)
                     }
                 }
             }
@@ -167,7 +178,9 @@ fun ComprarBitcoinPantalla(navController: NavController, vm: PerfilViewModel) {
                     Text(text = "COMISIÓN", color = Color(0xFF006D39), fontWeight = FontWeight.Bold, fontSize = 11.sp)
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(text = "0.50%", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFF006D39))
-                    Text(text = "$4.82 USD", color = Color(0xFF006D39).copy(alpha = 0.6f), fontSize = 12.sp)
+                    val cantNum = cantidad.toDoubleOrNull() ?: 0.0
+                    val comision = (cantNum * btcPrice) * 0.005
+                    Text(text = String.format(Locale.US, "%.2f %s", comision, currency.symbol), color = Color(0xFF006D39).copy(alpha = 0.6f), fontSize = 12.sp)
                 }
             }
         }
@@ -188,21 +201,24 @@ fun ComprarBitcoinPantalla(navController: NavController, vm: PerfilViewModel) {
                     Icon(imageVector = Icons.Default.Circle, contentDescription = null, tint = Color.LightGray, modifier = Modifier.size(18.dp))
                 }
                 Spacer(modifier = Modifier.height(20.dp))
+                val cantNum = cantidad.toDoubleOrNull() ?: 0.0
+                val subtotal = cantNum * btcPrice
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(text = "Subtotal", color = Color.Gray, fontSize = 15.sp)
-                    Text(text = "$964.22", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color(0xFF11224D))
+                    Text(text = String.format(Locale.US, "%.2f %s", subtotal, currency.symbol), fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color(0xFF11224D))
                 }
                 Spacer(modifier = Modifier.height(12.dp))
+                val comisionRed = 1.20 // Fijo para el ejemplo
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(text = "Comisión de Red", color = Color.Gray, fontSize = 15.sp)
-                    Text(text = "$1.20", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color(0xFF11224D))
+                    Text(text = String.format(Locale.US, "%.2f %s", comisionRed, currency.symbol), fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Color(0xFF11224D))
                 }
                 Spacer(modifier = Modifier.height(20.dp))
                 Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(Color(0xFFF1F1F1)))
                 Spacer(modifier = Modifier.height(20.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Text(text = "Total Final", fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Color(0xFF11224D))
-                    Text(text = "$970.24", color = Color(0xFF0D47D9), fontWeight = FontWeight.Bold, fontSize = 28.sp)
+                    Text(text = String.format(Locale.US, "%.2f %s", subtotal + comisionRed, currency.symbol), color = Color(0xFF0D47D9), fontWeight = FontWeight.Bold, fontSize = 28.sp)
                 }
             }
         }
@@ -213,7 +229,13 @@ fun ComprarBitcoinPantalla(navController: NavController, vm: PerfilViewModel) {
         // BOTÓN CONFIRMAR
         //==========================================
         Button(
-            onClick = { },
+            onClick = { 
+                val cantNum = cantidad.toDoubleOrNull() ?: 0.0
+                if (cantNum > 0) {
+                    vm.buyBitcoin(cantNum)
+                    navController.popBackStack()
+                }
+            },
             modifier = Modifier.fillMaxWidth().height(60.dp),
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D47D9))

@@ -61,13 +61,19 @@ fun IniciarSesionScreen(navController: NavController, vm: IniciarSesionViewModel
 
     val uiState by vm.uiState.collectAsState()
 
-    LaunchedEffect(uiState.isSuccess) {
-        if (uiState.isSuccess) {
-            navController.navigate(NavRutas.INICIO) {
-                popUpTo(NavRutas.INICIARSESION) { inclusive = true }
+    // Usamos el evento del canal para navegar solo UNA VEZ por login
+    LaunchedEffect(Unit) {
+        vm.navigationEvent.collect { success ->
+            if (success) {
+                navController.navigate(NavRutas.INICIO) {
+                    popUpTo(NavRutas.INICIARSESION) { inclusive = true }
+                }
             }
         }
     }
+
+    // Ya no necesitamos el resetState aquí porque el canal se encarga de que
+    // el evento de navegación no se repita al volver a la pantalla
 
     Column(
         modifier = Modifier

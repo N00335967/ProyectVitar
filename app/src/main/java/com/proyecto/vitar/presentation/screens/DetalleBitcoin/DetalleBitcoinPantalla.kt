@@ -1,17 +1,7 @@
 package com.proyecto.vitar.presentation.screens.DetalleBitcoin
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,13 +11,10 @@ import androidx.compose.material.icons.filled.CurrencyBitcoin
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.RemoveCircleOutline
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,9 +25,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.proyecto.vitar.core.navigation.NavRutas
+import java.util.Locale
 
 @Composable
-fun DetalleBitcoinPantalla(navController: NavController) {
+fun DetalleBitcoinPantalla(navController: NavController, vm: DetalleBitcoinViewModel) {
+
+    val uiState by vm.uiState.collectAsState()
+    val btc = uiState.bitcoin
+    val currency = uiState.selectedCurrency
 
     Column(
         modifier = Modifier
@@ -72,7 +64,7 @@ fun DetalleBitcoinPantalla(navController: NavController) {
         Spacer(modifier = Modifier.height(15.dp))
 
         Text(
-            text = "BITCOIN (BTC)",
+            text = "${btc?.name?.uppercase() ?: "BITCOIN"} (${btc?.symbol?.uppercase() ?: "BTC"})",
             color = Color.Gray,
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp
@@ -81,7 +73,7 @@ fun DetalleBitcoinPantalla(navController: NavController) {
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = "$64,285.40",
+            text = String.format(Locale.US, "%.2f %s", btc?.currentPrice ?: 0.0, currency.symbol),
             fontSize = 40.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF11224D)
@@ -99,7 +91,7 @@ fun DetalleBitcoinPantalla(navController: NavController) {
                 Icon(Icons.Default.TrendingUp, null, tint = Color(0xFF006D39), modifier = Modifier.size(14.dp))
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "+2.45% (24h)",
+                    text = String.format(Locale.US, "%+.2f%% (24h)", btc?.priceChangePercentage24h ?: 0.0),
                     color = Color(0xFF006D39),
                     fontWeight = FontWeight.Bold,
                     fontSize = 12.sp
@@ -121,7 +113,7 @@ fun DetalleBitcoinPantalla(navController: NavController) {
                 Column(modifier = Modifier.padding(15.dp)) {
                     Text(text = "CAP. MERCADO", color = Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "$1.26T", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFF11224D))
+                    Text(text = String.format(Locale.US, "%.2fT", (btc?.marketCap ?: 0.0) / 1_000_000_000_000.0), fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFF11224D))
                 }
             }
 
@@ -133,7 +125,7 @@ fun DetalleBitcoinPantalla(navController: NavController) {
                 Column(modifier = Modifier.padding(15.dp)) {
                     Text(text = "RANGO 24H", color = Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "$62k - $65k", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color(0xFF11224D))
+                    Text(text = String.format(Locale.US, "%.0fk - %.0fk", (btc?.low24h ?: 0.0)/1000, (btc?.high24h ?: 0.0)/1000), fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color(0xFF11224D))
                 }
             }
         }
@@ -176,9 +168,9 @@ fun DetalleBitcoinPantalla(navController: NavController) {
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(text = "$62,100", color = Color.Gray, fontSize = 12.sp)
-                    Text(text = "$64,285", color = Color.Gray, fontSize = 12.sp)
-                    Text(text = "$65,420", color = Color.Gray, fontSize = 12.sp)
+                    Text(text = String.format(Locale.US, "$%.0f", btc?.low24h ?: 0.0), color = Color.Gray, fontSize = 12.sp)
+                    Text(text = String.format(Locale.US, "$%.0f", btc?.currentPrice ?: 0.0), color = Color.Gray, fontSize = 12.sp)
+                    Text(text = String.format(Locale.US, "$%.0f", btc?.high24h ?: 0.0), color = Color.Gray, fontSize = 12.sp)
                 }
             }
         }
@@ -195,7 +187,8 @@ fun DetalleBitcoinPantalla(navController: NavController) {
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(text = "CANTIDAD INGRESADA", color = Color.White.copy(alpha = 0.7f), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(6.dp))
-                Text(text = "0.450 BTC", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.Bold)
+                val saldoEjemplo = 1.42857
+                Text(text = String.format(Locale.US, "%.5f BTC", saldoEjemplo), color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(15.dp))
                 Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(Color.White.copy(alpha = .3f)))
                 Spacer(modifier = Modifier.height(15.dp))
@@ -206,7 +199,8 @@ fun DetalleBitcoinPantalla(navController: NavController) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "$28,928.43", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 38.sp)
+                    val valorInversion = saldoEjemplo * (btc?.currentPrice ?: 0.0)
+                    Text(text = String.format(Locale.US, "%.2f %s", valorInversion, currency.symbol), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 38.sp)
                     Box(
                         modifier = Modifier.size(45.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.2f)),
                         contentAlignment = Alignment.Center
@@ -246,7 +240,7 @@ fun DetalleBitcoinPantalla(navController: NavController) {
             }
         }
 
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(100.dp))
     }
 }
 

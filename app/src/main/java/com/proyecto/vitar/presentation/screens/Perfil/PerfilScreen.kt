@@ -54,13 +54,47 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.proyecto.vitar.R
 import com.proyecto.vitar.core.navigation.NavRutas
+import com.proyecto.vitar.core.util.Currency
+import java.util.Locale
 
 @Composable
 fun PerfilScreen(navController: NavController, vm: PerfilViewModel) {
 
     val uiState by vm.uiState.collectAsState()
+    val currency = uiState.selectedCurrency
+    val btcPrice = uiState.btcPrice
+    val btcBalance = uiState.btcBalance
+
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        vm.refresh()
+    }
+
     var showEditDialog by remember { mutableStateOf(false) }
     var nuevoNombre by remember { mutableStateOf("") }
+    var showCurrencyDialog by remember { mutableStateOf(false) }
+
+    if (showCurrencyDialog) {
+        AlertDialog(
+            onDismissRequest = { showCurrencyDialog = false },
+            title = { Text("Seleccionar moneda") },
+            text = {
+                Column {
+                    Currency.entries.forEach { currencyItem ->
+                        TextButton(
+                            onClick = {
+                                vm.changeCurrency(currencyItem)
+                                showCurrencyDialog = false
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("${currencyItem.name} (${currencyItem.symbol})")
+                        }
+                    }
+                }
+            },
+            confirmButton = {}
+        )
+    }
 
     if (showEditDialog) {
         AlertDialog(
@@ -184,7 +218,7 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "1.42857",
+                        text = String.format(Locale.US, "%.5f", btcBalance),
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -202,8 +236,9 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "≈ $92,450.00 USD",
-                    color = Color.Gray
+                    text = String.format(Locale.US, "≈ %.2f %s", btcBalance * btcPrice, currency.symbol),
+                    color = Color.Gray,
+                    modifier = Modifier.clickable { showCurrencyDialog = true }
                 )
 
                 HorizontalDivider(
@@ -284,9 +319,15 @@ fun PerfilScreen(navController: NavController, vm: PerfilViewModel) {
                 texto = "Cerrar sesión",
                 colorTexto = Color.Red,
                 onClick = {
+                    // 1. Limpiar datos del usuario en el repo
                     vm.logout()
+                    
+                    // 2. Navegar al Login y BORRAR todo el historial de pantallas
+                    // El popUpTo(0) asegura que no quede NADA en la pila de navegación
                     navController.navigate(NavRutas.INICIARSESION) {
-                        popUpTo(0) { inclusive = true }
+                        popUpTo(0) {
+                            inclusive = true
+                        }
                     }
                 }
             )
@@ -351,7 +392,7 @@ fun OpcionPerfil(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable() {
+            .clickable {
                 onClick()
             }
             .padding(20.dp),

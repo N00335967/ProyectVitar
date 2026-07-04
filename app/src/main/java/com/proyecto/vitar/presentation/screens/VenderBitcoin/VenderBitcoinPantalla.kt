@@ -1,35 +1,18 @@
 package com.proyecto.vitar.presentation.screens.VenderBitcoin
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.TrendingUp
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,9 +22,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.proyecto.vitar.presentation.screens.Perfil.PerfilViewModel
+import java.util.Locale
 
 @Composable
 fun VenderBitcoinPantalla(navController: NavController, vm: PerfilViewModel) {
+
+    val uiState by vm.uiState.collectAsState()
+    val btcPrice = uiState.btcPrice
+    val currency = uiState.selectedCurrency
 
     var cantidad by remember {
         mutableStateOf("")
@@ -84,9 +72,9 @@ fun VenderBitcoinPantalla(navController: NavController, vm: PerfilViewModel) {
                 Row(
                     verticalAlignment = Alignment.Bottom
                 ) {
-
+                    // Usamos el saldo del ejemplo en Perfil: 1.42857
                     Text(
-                        text = "0.04285",
+                        text = "1.42857",
                         color = Color.White,
                         fontSize = 44.sp,
                         fontWeight = FontWeight.Bold
@@ -105,7 +93,7 @@ fun VenderBitcoinPantalla(navController: NavController, vm: PerfilViewModel) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "≈ $2,785.12 USD",
+                    text = String.format(Locale.US, "≈ %.2f %s", 1.42857 * btcPrice, currency.symbol),
                     color = Color.White.copy(alpha = .8f),
                     fontSize = 18.sp
                 )
@@ -140,34 +128,36 @@ fun VenderBitcoinPantalla(navController: NavController, vm: PerfilViewModel) {
 
                 Spacer(modifier = Modifier.height(28.dp))
 
-                Row(
+                BasicTextField(
+                    value = cantidad,
+                    onValueChange = { if (it.all { char -> char.isDigit() || char == '.' }) cantidad = it },
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Bottom
-                ) {
-
-                    Text(
-                        text =
-                            if (cantidad.isEmpty())
-                                "0.00"
-                            else
-                                cantidad,
+                    textStyle = androidx.compose.ui.text.TextStyle(
                         fontSize = 42.sp,
-                        color =
-                            if (cantidad.isEmpty())
-                                Color.LightGray
-                            else
-                                Color.Black,
+                        color = Color.Black,
                         fontWeight = FontWeight.Bold
-                    )
-
-                    Text(
-                        text = "BTC",
-                        fontSize = 24.sp,
-                        color = Color(0xFF2C2C2C)
-                    )
-
-                }
+                    ),
+                    decorationBox = { innerTextField ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.Bottom
+                        ) {
+                            Box(modifier = Modifier.weight(1f)) {
+                                if (cantidad.isEmpty()) {
+                                    Text("0.00", fontSize = 42.sp, color = Color.LightGray, fontWeight = FontWeight.Bold)
+                                }
+                                innerTextField()
+                            }
+                            Text(
+                                text = "BTC",
+                                fontSize = 24.sp,
+                                color = Color(0xFF2C2C2C),
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                        }
+                    }
+                )
 
                 Spacer(modifier = Modifier.height(18.dp))
 
@@ -191,8 +181,9 @@ fun VenderBitcoinPantalla(navController: NavController, vm: PerfilViewModel) {
                         fontSize = 18.sp
                     )
 
+                    val cantNum = cantidad.toDoubleOrNull() ?: 0.0
                     Text(
-                        text = "$0.00 USD",
+                        text = String.format(Locale.US, "%.2f %s", cantNum * btcPrice, currency.symbol),
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp
                     )
@@ -206,13 +197,13 @@ fun VenderBitcoinPantalla(navController: NavController, vm: PerfilViewModel) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
 
-                    BotonPorcentaje("25%")
+                    BotonPorcentaje("25%") { cantidad = String.format(Locale.US, "%.5f", 1.42857 * 0.25) }
 
-                    BotonPorcentaje("50%")
+                    BotonPorcentaje("50%") { cantidad = String.format(Locale.US, "%.5f", 1.42857 * 0.50) }
 
-                    BotonPorcentaje("75%")
+                    BotonPorcentaje("75%") { cantidad = String.format(Locale.US, "%.5f", 1.42857 * 0.75) }
 
-                    BotonPorcentaje("MAX")
+                    BotonPorcentaje("MAX") { cantidad = "1.42857" }
 
                 }
 
@@ -264,7 +255,7 @@ fun VenderBitcoinPantalla(navController: NavController, vm: PerfilViewModel) {
                     Spacer(modifier = Modifier.height(14.dp))
 
                     Text(
-                        text = "$64,982.40",
+                        text = String.format(Locale.US, "%.2f %s", btcPrice, currency.symbol),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -360,7 +351,13 @@ fun VenderBitcoinPantalla(navController: NavController, vm: PerfilViewModel) {
 
         // BOTÓN CONFIRMAR VENTA
         Button(
-            onClick = { },
+            onClick = { 
+                val cantNum = cantidad.toDoubleOrNull() ?: 0.0
+                if (cantNum > 0) {
+                    vm.sellBitcoin(cantNum)
+                    navController.popBackStack()
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(58.dp),
@@ -387,19 +384,18 @@ fun VenderBitcoinPantalla(navController: NavController, vm: PerfilViewModel) {
             modifier = Modifier.padding(horizontal = 20.dp)
         )
 
-        Spacer(modifier = Modifier.height(30.dp))
-
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(100.dp))
     }
 }
 
 @Composable
 fun BotonPorcentaje(
-    texto: String
+    texto: String,
+    onClick: () -> Unit = {}
 ) {
 
     Button(
-        onClick = { },
+        onClick = onClick,
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.White,
             contentColor = Color.Black

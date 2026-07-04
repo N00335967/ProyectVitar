@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.proyecto.vitar.domain.usecase.UsuarioUseCases
 import com.proyecto.vitar.presentation.event.EventBus
 import com.proyecto.vitar.presentation.event.UiEvent
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class IniciarSesionViewModel(
@@ -15,6 +17,10 @@ class IniciarSesionViewModel(
 
     private val _uiState = MutableStateFlow(IniciarSesionUiState())
     val uiState = _uiState.asStateFlow()
+
+    // Canal para navegación (evento de una sola vez)
+    private val _navigationEvent = Channel<Boolean>()
+    val navigationEvent = _navigationEvent.receiveAsFlow()
 
     fun iniciarSesion(correo: String, password: String) {
         viewModelScope.launch {
@@ -30,6 +36,7 @@ class IniciarSesionViewModel(
                 if (usuario != null) {
                     _uiState.value = _uiState.value.copy(isLoading = false, isSuccess = true)
                     EventBus.sendEvent(UiEvent.Success("Bienvenido ${usuario.nombre}"))
+                    _navigationEvent.send(true) // Disparamos el evento de navegar
                 } else {
                     _uiState.value = _uiState.value.copy(isLoading = false)
                     EventBus.sendEvent(UiEvent.Error("No se pudo iniciar sesión"))
@@ -39,5 +46,9 @@ class IniciarSesionViewModel(
                 EventBus.sendEvent(UiEvent.Error(e.message ?: "Error de conexión"))
             }
         }
+    }
+
+    fun resetState() {
+        _uiState.value = IniciarSesionUiState()
     }
 }

@@ -36,10 +36,10 @@ fun AppNavigation(
             RegistrarseScreen(navController, container.registrarseViewModel)
         }
         composable(NavRutas.INICIO) {
-            InicioScreen(navController)
+            InicioScreen(navController, container.inicioViewModel)
         }
         composable(NavRutas.HISTORIAL) {
-            HistorialScreen()
+            HistorialScreen(container.historialViewModel)
         }
         composable(NavRutas.PERFIL) {
             PerfilScreen(navController, container.perfilViewModel)
@@ -51,7 +51,7 @@ fun AppNavigation(
             VenderBitcoinPantalla(navController, container.perfilViewModel)
         }
         composable(NavRutas.DETALLEBITCOIN) {
-            DetalleBitcoinPantalla(navController)
+            DetalleBitcoinPantalla(navController, container.detalleBitcoinViewModel)
         }
         composable(NavRutas.RECUPERAR_PASSWORD) {
             RecuperarPasswordScreen(navController)
